@@ -1,0 +1,89 @@
+{
+  "entities": {
+    "users": {
+      "title": "User Profile",
+      "description": "Information about donors and receivers",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Full name" },
+        "phone": { "type": "string", "description": "Phone number" },
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "enum": ["Donor", "Receiver"] },
+        "orgType": { "type": "string", "enum": ["NGO", "Hotel", "Restaurant", "Organization", "Individual"] },
+        "photoURL": { "type": "string", "description": "Profile picture URL" },
+        "bio": { "type": "string", "description": "User biography" }
+      },
+      "required": ["name", "phone", "email", "role"]
+    },
+    "donations": {
+      "title": "Donation",
+      "description": "Available food donation",
+      "type": "object",
+      "properties": {
+        "donorId": { "type": "string" },
+        "donorName": { "type": "string" },
+        "donorPhone": { "type": "string" },
+        "donorAddress": { "type": "string" },
+        "pincode": { "type": "string" },
+        "foodName": { "type": "string" },
+        "quantity": { "type": "string" },
+        "location": { "type": "string" },
+        "expiry": { "type": "string" },
+        "expiresAt": { "type": "string", "format": "date-time" },
+        "dietaryType": { "type": "string", "enum": ["Veg", "Non-Veg"] },
+        "imageUrls": { "type": "array", "items": { "type": "string" } },
+        "status": { "type": "string", "enum": ["Available", "Pending", "Claimed", "Expired"] },
+        "claimedBy": { "type": "string" },
+        "rating": { "type": "number" },
+        "ratingMessage": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["donorId", "donorName", "donorPhone", "donorAddress", "pincode", "foodName", "quantity", "location", "expiry", "expiresAt", "dietaryType", "status", "createdAt", "imageUrls"]
+    },
+    "claims": {
+      "title": "Claim",
+      "description": "Record of a food claim",
+      "type": "object",
+      "properties": {
+        "donationId": { "type": "string" },
+        "receiverId": { "type": "string" },
+        "donorId": { "type": "string" },
+        "receiverName": { "type": "string" },
+        "receiverPhone": { "type": "string" },
+        "status": { "type": "string", "enum": ["Pending", "Accepted", "Declined"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["donationId", "receiverId", "donorId", "receiverName", "receiverPhone", "status", "createdAt"]
+    },
+    "notifications": {
+      "title": "Notification",
+      "description": "User notification",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string", "enum": ["info", "success"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "message", "type", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "users",
+      "description": "Private user profiles"
+    },
+    "/donations/{donationId}": {
+      "schema": "donations",
+      "description": "Public food donations"
+    },
+    "/claims/{claimId}": {
+      "schema": "claims",
+      "description": "Claims records"
+    },
+    "/notifications/{notificationId}": {
+      "schema": "notifications",
+      "description": "User notifications"
+    }
+  }
+}

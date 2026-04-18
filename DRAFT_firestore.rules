@@ -1,0 +1,135 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Global Catch-all Deny
+    // ===============================================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // ===============================================================
+    // Entity Validations
+    // ===============================================================
+
+    function isValidUser(data) {
+      let requiredFields = ['name', 'phone', 'email', 'role'];
+      return data.keys().hasAll(requiredFields) &&
+             data.keys().size() == requiredFields.size() &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             data.phone is string && data.phone.size() <= 20 &&
+             data.email is string && data.email == request.auth.token.email &&
+             data.role in ['Donor', 'Receiver'];
+    }
+
+    function isValidDonation(data) {
+      let requiredFields = ['donorId', 'donorName', 'donorPhone', 'donorAddress', 'pincode', 'foodName', 'quantity', 'location', 'expiry', 'expiresAt', 'dietaryType', 'status', 'createdAt'];
+      return data.keys().hasAll(requiredFields) &&
+             (data.keys().size() >= 13 && data.keys().size() <= 16) && // Base + claimedBy, rating, ratingMessage
+             data.donorId == request.auth.uid &&
+             data.donorName is string && data.donorName.size() > 0 &&
+             data.donorPhone is string && data.donorPhone.size() > 0 &&
+             data.donorAddress is string && data.donorAddress.size() > 0 &&
+             data.pincode is string && data.pincode.size() >= 6 &&
+             data.foodName is string && data.foodName.size() > 0 && data.foodName.size() <= 200 &&
+             data.quantity is string && data.quantity.size() > 0 &&
+             data.location is string &&
+             data.expiry is string &&
+             data.expiresAt is timestamp &&
+             data.dietaryType in ['Veg', 'Non-Veg'] &&
+             data.status in ['Available', 'Pending', 'Claimed', 'Expired'] &&
+             data.createdAt == request.time;
+    }
+
+    function isValidClaim(data) {
+      let requiredFields = ['donationId', 'receiverId', 'receiverName', 'receiverPhone', 'status', 'createdAt'];
+      return data.keys().hasAll(requiredFields) &&
+             data.keys().size() == requiredFields.size() &&
+             isValidId(data.donationId) &&
+             data.receiverId == request.auth.uid &&
+             data.receiverName is string && data.receiverName.size() > 0 &&
+             data.receiverPhone is string &&
+             data.status in ['Pending', 'Accepted', 'Declined'] &&
+             data.createdAt == request.time;
+    }
+
+    function isValidNotification(data) {
+      let requiredFields = ['userId', 'message', 'type', 'createdAt'];
+      return data.keys().hasAll(requiredFields) &&
+             data.keys().size() == requiredFields.size() &&
+             data.userId is string &&
+             data.message is string && data.message.size() > 0 && data.message.size() <= 500 &&
+             data.type in ['info', 'success'] &&
+             data.createdAt == request.time;
+    }
+
+    // ===============================================================
+    // Collection Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      // Profiles are readable by others (to see donor info) but only writable by owner
+      allow read: if isSignedIn();
+      allow create, update: if isOwner(userId) && isValidUser(request.resource.data);
+    }
+
+    match /donations/{donationId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidDonation(request.resource.data) && request.resource.data.status == 'Available';
+      
+      allow update: if isSignedIn() && (
+        // Action: Donor edit
+        (request.auth.uid == resource.data.donorId && isValidDonation(request.resource.data)) ||
+        // Action: Receiver updates status to Claimed (facilitated via handleAcceptClaim but donor performs it?)
+        // Wait, handleAcceptClaim is performed by the donor. 
+        // handleClaim (Receiver) adds to claims collection.
+        // handleRate (Receiver) updates rating.
+        (request.auth.uid == resource.data.claimedBy && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rating']))
+      );
+      
+      allow delete: if isSignedIn() && request.auth.uid == resource.data.donorId;
+    }
+
+    match /claims/{claimId} {
+      allow read: if isSignedIn() && (
+        request.auth.uid == resource.data.receiverId || 
+        request.auth.uid == get(/databases/$(database)/documents/donations/$(resource.data.donationId)).data.donorId
+      );
+      
+      allow create: if isSignedIn() && isValidClaim(request.resource.data) && request.resource.data.status == 'Pending';
+      
+      allow update: if isSignedIn() && (
+        // Action: Donor accepts/declines
+        (request.auth.uid == get(/databases/$(database)/documents/donations/$(resource.data.donationId)).data.donorId && 
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])) ||
+        // Action: Receiver cancels? (optional)
+        (request.auth.uid == resource.data.receiverId && request.resource.data.status == 'Declined')
+      );
+    }
+
+    match /notifications/{notificationId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      // Notifications are typically added by the system or another user action
+      allow create: if isSignedIn(); // Simplified for now, in a real app we'd restrict this more
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+  }
+}

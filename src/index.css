@@ -1,0 +1,80 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-bg: #050507;
+  --color-surface: rgba(255, 255, 255, 0.04);
+  --color-accent: #ff6b2b;
+  --color-accent-glow: rgba(255, 107, 43, 0.3);
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #94949e;
+  --color-border-theme: rgba(255, 255, 255, 0.08);
+}
+
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.light-theme {
+  --color-bg: #f8f9fa;
+  --color-surface: rgba(0, 0, 0, 0.05);
+  --color-text-primary: #121212;
+  --color-text-secondary: #5a5a66;
+  --color-border-theme: rgba(0, 0, 0, 0.1);
+}
+
+@layer base {
+  body {
+    @apply bg-bg text-text-primary font-sans antialiased overflow-x-hidden;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-surface backdrop-blur-[16px] border border-border-theme;
+  }
+  
+  .glass-card {
+    @apply bg-surface backdrop-blur-[16px] border border-border-theme rounded-[20px] transition-transform duration-200 hover:scale-[1.02];
+  }
+  
+  .btn-primary {
+    @apply bg-accent text-white font-semibold py-2 px-4 rounded-lg hover:opacity-90 transition-all;
+  }
+  
+  .btn-secondary {
+    @apply bg-text-primary text-bg font-semibold py-2 px-4 rounded-lg hover:opacity-90 transition-all;
+  }
+  
+  .nav-item {
+    @apply flex items-center gap-3 py-3 px-4 rounded-xl text-text-secondary hover:bg-surface hover:text-text-primary transition-all;
+  }
+  
+  .nav-item-active {
+    @apply bg-surface backdrop-blur-[16px] border border-border-theme bg-surface text-text-primary shadow-2xl;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-theme);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary);
+}
+
