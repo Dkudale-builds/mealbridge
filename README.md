@@ -141,7 +141,4 @@ Push notifications
 Expiry alerts
 Payment / reward system
 Multi-language support
-├── public/
-├── README.md
-├── package.json
-└── vite.config.ts
+
