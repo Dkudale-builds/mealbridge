@@ -1,10 +1,11 @@
-#MealBridge Premium:
+# MealBridge Premium:
 
 A smart Food Waste Redistribution Platform that connects food donors (individuals, restaurants, NGOs) with receivers in need reducing food waste and supporting communities.
 
-#Overview:
+# Overview:
 
-MealBridge Premium is a full-stack web application designed to solve the real-world problem of food wastage. It enables users to:
+MealBridge Premium is a full-stack web application designed to solve the real-world problem of food wastage. 
+## It enables users to:
 
 Donate excess food
 Discover nearby available meals in real-time
@@ -12,7 +13,7 @@ Claim and manage food pickups
 Track contributions and environmental impact
 The platform focuses on efficiency, transparency, and sustainability.
 
-#Key Features:
+# Key Features:
                                                                                                                    
 User Roles
 Donor Mode
@@ -33,7 +34,8 @@ Map-based UI showing nearby food donations
 Smart filtering based on selected city
 Interactive Map Integration
 Real-time food availability markers
-Clickable markers showing:
+
+## Clickable markers showing:
 Food name
 Quantity
 Expiry time
@@ -41,8 +43,7 @@ Location
 Quick "Claim Meal" action directly from map popup
 Donation Management
 
-Add new donations via modal form
-Fields include:
+## Add new donations via modal form Fields include:
 
 Food name
 Dietary preference (Veg / Non-Veg)
@@ -52,9 +53,7 @@ Pickup address
 Pincode
 Food images (multiple allowed)
 
-Smart Matching System
-Connects receivers with nearby donors
-Shows:
+## Smart Matching System Connects receivers with nearby donors Shows:
 
 Active dishes
 Availability status
@@ -62,7 +61,7 @@ Expiry countdown
 Prevents expired or already claimed items
 Status Tracking
 
-Food states:
+## Food states:
 
 Available
 Claimed
@@ -70,7 +69,7 @@ Reserved
 Real-time updates on food availability
 User Dashboard & Analytics
 
-Track personal contributions:
+## Track personal contributions:
 
 Total meals shared
 Active listings
@@ -80,13 +79,12 @@ History & Feedback System
 View past donations
 Rate and provide feedback
 Track completed transactions Modern UI/UX
-
 Dark mode / Light mode toggle
 Premium dashboard-style interface
 Smooth transitions and card based layout
 Mobile-responsive design
 
-Problem Solved:
+# Problem Solved:
 
 Reduces food wastage
 Helps people in need
@@ -94,16 +92,11 @@ Improves resource distribution
 Encourages community participation
 Promotes sustainability awareness
 
-
-
-
-Frontend:
-
+## Frontend:
 React (Vite)
 Tailwind CSS / Custom UI
 
-Backend:
-
+## Backend:
 Firebase / Supabase (Auth + DB)
 Database
 Real-time database (Firestore / Supabase)
@@ -112,8 +105,7 @@ Mapbox / Leaflet / Google Maps API
 Storage
 Firebase Storage / Cloud Storage
 
-Core Workflow: 
-
+# Core Workflow: 
 Donor adds food donation
 Data stored in backend (with location + expiry)
 Receivers view nearby food via dashboard/map
@@ -125,7 +117,7 @@ User login/signup
 Role based access
 Profile management
 
-Project Structure:
+# Project Structure:
 /src
  ├── components
  ├── pages
@@ -134,7 +126,7 @@ Project Structure:
  ├── assets
  └── App.jsx
 
-Screens Included:
+## Screens Included:
 
 Dashboard (Nearby Meals)
 Map View
@@ -143,7 +135,7 @@ Add Donation Modal
 History Page
 Profile & Analytics
 
-Future Enhancements:
+# Future Enhancements:
 
 AI-based food matching
 Route optimization for pickup
